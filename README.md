@@ -6,6 +6,12 @@ Evidence Extractor is a **Chrome extension (Manifest V3)** that opens in the **S
 - **Claims** (unproven assertions; expand to see *why + evidence quote*)
 - **Opinions** (subjective statements; expand to see *why it’s opinion*)
 
+![German website](german.png)
+![Ukranian website](ukranian.png)
+![Russian website](russian.png)
+
+![Settings](settings.png)
+
 **Language behavior**
 - Output items (`facts[].text`, `claims[].text`, `why_claim`, `opinions[].text`, `why_opinion`) are always **English**.
 - Evidence is an **exact quote** from the original page text (original language; not translated).
