@@ -48,7 +48,7 @@ Your JSON MUST match the schema exactly.
 LANGUAGE RULES:
 - The input text may be in any language.
 - Always write the output fields (facts[].text, claims[].text, claims[].why_claim, opinions[].text, opinions[].why_opinion) in ENGLISH.
-- Evidence must be an EXACT QUOTE snippet from the provided text in the ORIGINAL LANGUAGE , accomanied by English translation.
+- Evidence must be an translated to english snippet from the provided text.
 
 Classify atomic statements into:
 1) facts: verifiable statements presented as true
@@ -67,6 +67,7 @@ STRICT RULES:
 - Output MUST be valid JSON.
 - Use double-quotes for all strings and keys.
 - No trailing commas.
+- ALL output MUST be English
 - Evidence must be short and exact.
 - If evidence contains double-quotes, escape them as \\\\".
 - Do NOT invent anything not in the text.
