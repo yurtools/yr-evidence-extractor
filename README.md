@@ -1,4 +1,3 @@
-````markdown
 # Evidence Extractor — Chrome Side Panel Extension
 
 Evidence Extractor is a **Chrome extension (Manifest V3)** that opens in the **Side Panel**, extracts the active page’s readable text, sends it to an LLM (Local LM Studio or public providers), and renders:
@@ -132,74 +131,58 @@ The extension expects the model to return **one JSON object** with this shape:
     { "text": "…", "why_opinion": "…" }
   ]
 }
-````
 
-Notes:
+## Notes
 
-* Missing categories must be `[]` (not `null`)
-* Evidence must be a direct quote from the input text
+- Missing categories must be `[]` (not `null`).
+- Evidence must be a **direct quote** from the input text.
 
 ---
 
 ## Troubleshooting
 
 ### “Provider HTTP 401 invalid_api_key”
-
 Your cloud provider API key is missing or invalid.
 
-* Open **Settings → API Key**
-* Paste the correct key for that provider
-* For OpenAI, keys are managed in your OpenAI account dashboard.
+- Open **Settings → API Key**
+- Paste the correct key for that provider
+- For **OpenAI**, keys are managed in your OpenAI account dashboard
 
 ### “Provider HTTP 400: 'response_format.type' must be 'json_schema' or 'text'”
-
 This usually indicates a Local (LM Studio) compatibility issue:
 
-* Ensure provider is **Local**
-* Ensure the request uses `json_schema` (the app does for Local)
-* Confirm you’re targeting the correct LM Studio endpoint
+- Ensure provider is **Local**
+- Ensure the request uses `json_schema` (the app does for Local)
+- Confirm you’re targeting the correct LM Studio endpoint
 
 ### “Expected ',' or '}' after property value in JSON…”
-
 The model returned malformed JSON.
 
-* Try a different model
-* Reduce output verbosity (edit prompt)
-* The extension includes basic JSON repair, but cannot fix heavily broken output
+- Try a different model
+- Reduce output verbosity (edit prompt)
+- The extension includes basic JSON repair, but cannot fix heavily broken output
 
 ### Cannot extract text on some pages
-
 Chrome restricts content scripts on certain URLs (e.g., `chrome://…`).
 
-* Use a normal web page (http/https)
-* For PDF viewer pages, extraction may be limited
+- Use a normal web page (`http`/`https`)
+- For PDF viewer pages, extraction may be limited
 
 ---
 
 ## Security Notes
 
-* API keys are stored locally in the browser extension storage (`chrome.storage.local`)
-* Keys are only used from the extension context (not injected into web pages)
-* Do not share your extension storage/profile if it contains keys
+- API keys are stored locally in the browser extension storage (`chrome.storage.local`)
+- Keys are only used from the extension context (not injected into web pages)
+- Do not share your extension storage/profile if it contains keys
 
 ---
 
 ## Development Notes (Optional)
 
-* Use Chrome DevTools:
+### Use Chrome DevTools
+- Side panel DevTools: open side panel → right click → **Inspect**
+- Service worker logs: `chrome://extensions` → extension → **Service worker**
 
-  * Side panel DevTools: open side panel → right click → Inspect
-  * Service worker logs: `chrome://extensions` → extension → Service worker
-* Reload extension after edits:
-
-  * `chrome://extensions` → click **Reload** on the extension card
-
----
-
-## License
-
-Add your preferred license (MIT/Apache-2.0/etc.) here.
-
-```
-::contentReference[oaicite:0]{index=0}
-```
+### Reload extension after edits
+- `chrome://extensions` → click **Reload** on the extension card
