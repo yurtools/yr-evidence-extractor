@@ -1,0 +1,480 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --border:rgba(255,255,255,.08);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.62);
+      --muted2:rgba(255,255,255,.45);
+      --accent:#7c5cff;
+      --accent2:#22c55e;
+      --warn:#f59e0b;
+
+      --r16:16px;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --shadow2: 0 10px 22px rgba(0,0,0,.28);
+      --blur: saturate(140%) blur(10px);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 600px at 10% -20%, rgba(124,92,255,.45), transparent 60%),
+                  radial-gradient(1000px 700px at 110% 10%, rgba(34,197,94,.22), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      overflow:hidden;
+    }
+
+    .app{ height:100%; display:flex; flex-direction:column; }
+
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      padding:14px 14px 10px;
+      background: linear-gradient(to bottom, rgba(11,15,25,.86), rgba(11,15,25,.60));
+      backdrop-filter: var(--blur);
+      border-bottom: 1px solid var(--border);
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .logo{ display:flex; align-items:center; gap:10px; min-width:0; }
+    .mark{
+      width:34px;height:34px;border-radius:12px;
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(34,197,94,.9));
+      box-shadow: 0 12px 40px rgba(124,92,255,.25);
+      display:grid; place-items:center;
+      flex:0 0 auto;
+    }
+    .brand h1{
+      font-size:14px;
+      letter-spacing:.2px;
+      margin:0;
+      font-weight:700;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .btn{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:9px 10px;
+      border-radius: 12px;
+      cursor:pointer;
+      transition: .15s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.15);
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.085); }
+    .btn:active{ transform: translateY(0px); opacity:.92; }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(124,92,255,1), rgba(124,92,255,.55));
+      border-color: rgba(124,92,255,.45);
+      box-shadow: 0 12px 30px rgba(124,92,255,.22);
+    }
+    .btn.ghost{ background: transparent; box-shadow:none; }
+
+    .controls{ display:flex; gap:10px; align-items:center; }
+    .search{
+      flex:1; display:flex; align-items:center; gap:8px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding:10px 12px;
+      box-shadow: var(--shadow2);
+      min-width:0;
+    }
+    .search input{
+      width:100%; border:none; outline:none; background: transparent;
+      color: var(--text); font-size:13px;
+    }
+    .search input::placeholder{ color: rgba(255,255,255,.38); }
+
+    .seg{
+      display:flex;
+      background: rgba(255,255,255,.05);
+      border:1px solid var(--border);
+      border-radius: 14px;
+      overflow:hidden;
+      box-shadow: var(--shadow2);
+      flex:0 0 auto;
+    }
+    .seg button{
+      padding:10px 10px;
+      font-size:12px;
+      color: var(--muted);
+      background: transparent;
+      border:none;
+      cursor:pointer;
+      transition: .15s ease;
+      min-width:72px;
+    }
+    .seg button.active{
+      color: var(--text);
+      background: rgba(124,92,255,.22);
+    }
+
+    .status{ font-size:12px; color: var(--muted); white-space:nowrap; }
+
+    .content{ padding: 12px 14px 14px; overflow:auto; height:100%; }
+
+    .chips{ display:flex; gap:8px; flex-wrap:wrap; margin: 10px 0 14px; }
+    .chip{
+      display:inline-flex; gap:8px; align-items:center;
+      padding:7px 10px;
+      border-radius: 999px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-size:12px;
+    }
+    .chip b{ color: var(--text); font-weight:700; }
+    .dot{ width:7px;height:7px;border-radius:999px;background: var(--accent); opacity:.9; }
+    .dot.green{ background: var(--accent2); }
+    .dot.orange{ background: var(--warn); }
+
+    .list{ display:flex; flex-direction:column; gap:10px; }
+
+    .card{
+      border:1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+      border-radius: var(--r16);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .card::before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(900px 150px at 10% 0%, rgba(124,92,255,.18), transparent 60%),
+                  radial-gradient(700px 140px at 90% 10%, rgba(34,197,94,.10), transparent 55%);
+      pointer-events:none;
+      opacity:.85;
+    }
+    .card > *{ position:relative; }
+
+    details.card summary{
+      list-style:none;
+      cursor:pointer;
+      padding: 12px 12px;
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+    }
+    details.card summary::-webkit-details-marker{ display:none; }
+
+    .badge{
+      flex:0 0 auto;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 8px;
+      border-radius: 999px;
+      font-size:11px;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      margin-top:1px;
+    }
+    .badge.fact{ border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.10); }
+    .badge.claim{ border-color: rgba(245,158,11,.25); background: rgba(245,158,11,.10); }
+    .badge.opinion{ border-color: rgba(124,92,255,.30); background: rgba(124,92,255,.13); }
+
+    .textblock{ min-width:0; }
+    .title{
+      font-size:13px;
+      line-height:1.25rem;
+      font-weight:650;
+      margin:0;
+      color: var(--text);
+    }
+    .subtitle{
+      margin:6px 0 0;
+      font-size:12px;
+      color: var(--muted);
+      line-height:1.1rem;
+    }
+
+    .body{
+      padding: 0 12px 12px;
+      border-top: 1px solid rgba(255,255,255,.06);
+      background: rgba(0,0,0,.12);
+    }
+    .kv{
+      margin:10px 0 0;
+      padding:10px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 10px 24px rgba(0,0,0,.12);
+    }
+    .kv .k{ font-size:11px; color: var(--muted2); margin-bottom:6px; }
+    .kv .v{
+      font-family: var(--mono);
+      font-size:12px;
+      color: rgba(255,255,255,.9);
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height:1.15rem;
+    }
+
+    .skeleton{
+      border-radius: var(--r16);
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+    .skeleton::after{
+      content:"";
+      position:absolute; inset:0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.10), transparent);
+      transform: translateX(-100%);
+      animation: shimmer 1.1s infinite;
+    }
+    @keyframes shimmer{ to{ transform: translateX(100%); } }
+    .sk-row{ padding:12px; display:flex; gap:10px; align-items:flex-start; }
+    .sk-pill{ width:64px; height:22px; border-radius:999px; background: rgba(255,255,255,.06); }
+    .sk-lines{ flex:1; display:flex; flex-direction:column; gap:8px; }
+    .sk-line{ height:10px; border-radius:999px; background: rgba(255,255,255,.06); }
+    .sk-line.s2{ width:84%; }
+    .sk-line.s3{ width:70%; }
+
+    .drawer{ position:fixed; inset:0; display:none; z-index:50; }
+    .drawer.open{ display:block; }
+    .backdrop{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
+    }
+    .sheet{
+      position:absolute;
+      right:0; top:0; bottom:0;
+      width:min(420px, 94vw);
+      background: linear-gradient(180deg, rgba(18,27,51,.98), rgba(15,22,41,.98));
+      border-left:1px solid var(--border);
+      box-shadow: -20px 0 50px rgba(0,0,0,.45);
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      overflow:auto;
+    }
+
+    .field{ display:flex; flex-direction:column; gap:6px; }
+    .label{ font-size:12px; color: var(--muted); }
+
+    select, input, textarea{
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      padding:10px 12px;
+      border-radius: 14px;
+      outline:none;
+      transition:.15s ease;
+      font-family: inherit;
+    }
+    textarea{ font-family: var(--mono); font-size:12px; line-height:1.15rem; resize: vertical; }
+    input::placeholder, textarea::placeholder{ color: rgba(255,255,255,.38); }
+
+    .hint{ font-size:12px; color: var(--muted2); line-height:1.1rem; }
+    .mini{
+      font-size:11px;
+      color: var(--muted2);
+      font-family: var(--mono);
+      padding: 8px 10px;
+      border:1px dashed rgba(255,255,255,.12);
+      border-radius: 14px;
+      background: rgba(0,0,0,.20);
+    }
+
+    .debug{
+      margin-top: 12px;
+      border:1px solid var(--border);
+      border-radius: var(--r16);
+      background: rgba(255,255,255,.03);
+      overflow:hidden;
+    }
+    .debug summary{
+      padding: 10px 12px;
+      cursor:pointer;
+      color: var(--muted);
+      font-size:12px;
+      list-style:none;
+    }
+    .debug summary::-webkit-details-marker{ display:none; }
+    .debug .dbg-body{ border-top: 1px solid rgba(255,255,255,.06); padding: 10px 12px; }
+    #pagePreview{
+      width:100%;
+      height:110px;
+      font-family: var(--mono);
+      font-size:12px;
+      background: rgba(0,0,0,.18);
+    }
+
+    .errorbox{
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height:1.2rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      padding:10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(239,68,68,.35);
+      background: rgba(239,68,68,.10);
+      color: rgba(255,255,255,.92);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">
+          <div class="mark" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2l8 5v10l-8 5-8-5V7l8-5Z" stroke="rgba(255,255,255,.92)" stroke-width="1.6"/>
+              <path d="M8.6 12.2l2.3 2.3 4.6-5.2" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div style="min-width:0;">
+            <h1>Evidence Extractor</h1>
+            <div class="sub" id="pageTitle">Ready</div>
+          </div>
+        </div>
+
+        <div class="row" style="flex:0 0 auto;">
+          <button class="btn ghost" id="settingsBtn" title="Settings">⚙️</button>
+          <button class="btn primary" id="refreshBtn" title="Refresh">⟳ Refresh</button>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="search">
+          <span style="opacity:.7">⌕</span>
+          <input id="search" placeholder="Search facts, claims, opinions…" />
+        </div>
+
+        <div class="seg" role="tablist" aria-label="Category">
+          <button id="tabFacts" class="active">Facts</button>
+          <button id="tabClaims">Claims</button>
+          <button id="tabOpinions">Opinions</button>
+        </div>
+
+        <div class="status" id="status">Idle</div>
+      </div>
+
+      <div class="chips" id="chips" style="display:none;">
+        <div class="chip"><span class="dot green"></span><b id="factsCount">0</b> facts</div>
+        <div class="chip"><span class="dot orange"></span><b id="claimsCount">0</b> claims</div>
+        <div class="chip"><span class="dot"></span><b id="opinionsCount">0</b> opinions</div>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="list" id="list"></div>
+
+      <details class="debug">
+        <summary>Debug (extracted text preview)</summary>
+        <div class="dbg-body">
+          <textarea id="pagePreview" readonly></textarea>
+        </div>
+      </details>
+
+      <div id="errorWrap" style="margin-top:12px; display:none;">
+        <div class="errorbox" id="errors"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="drawer" id="drawer">
+    <div class="backdrop" id="drawerClose"></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-label="Settings">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="margin:0; font-size:14px;">Settings</h2>
+        <button class="btn" id="closeSettings">Close</button>
+      </div>
+
+      <div class="field">
+        <div class="label">Provider</div>
+        <select id="provider">
+          <option value="local">Local (LM Studio / OpenAI-compatible)</option>
+          <option value="openai">OpenAI</option>
+          <option value="claude">Claude (Anthropic)</option>
+          <option value="gemini">Gemini (Google)</option>
+          <option value="kimi_global">Kimi (Moonshot) — Global</option>
+          <option value="kimi_cn">Kimi (Moonshot) — China</option>
+        </select>
+        <div class="hint">Local uses <b>json_schema</b> response_format (LM Studio compatible) to force strict JSON.</div>
+      </div>
+
+      <div class="field">
+        <div class="label">API Key</div>
+        <input id="apiKey" type="password" placeholder="Required for cloud providers" />
+      </div>
+
+      <div class="field">
+        <div class="label">Model</div>
+        <div style="display:flex; gap:10px;">
+          <select id="modelSelect" style="flex:1;">
+            <option value="">(load models)</option>
+          </select>
+          <button class="btn" id="loadModelsBtn">Load</button>
+        </div>
+      </div>
+
+      <div class="field" id="modelCustomWrap" style="display:none;">
+        <div class="label">Custom model</div>
+        <input id="modelCustom" placeholder="Type model id/name…" />
+      </div>
+
+      <div class="field">
+        <div class="label">Endpoint override</div>
+        <input id="endpoint" placeholder="http://127.0.0.1:1234/v1/chat/completions" />
+      </div>
+
+      <div class="field">
+        <div class="label">Max chars to send</div>
+        <input id="maxChars" value="30000" />
+      </div>
+
+      <div class="field">
+        <div class="label">Prompt template (Python)</div>
+        <textarea id="promptPy" style="height:260px;" spellcheck="false"></textarea>
+        <div class="hint">
+          Use placeholders: <b>{title}</b>, <b>{url}</b>, <b>{text}</b>.<br>
+          Requirement: output list items in <b>English</b> even if input text is not English; evidence remains exact quote in original language.
+        </div>
+      </div>
+
+      <div class="mini" id="providerHint"></div>
+    </div>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
