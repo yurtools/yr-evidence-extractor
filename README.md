@@ -131,6 +131,7 @@ The extension expects the model to return **one JSON object** with this shape:
     { "text": "…", "why_opinion": "…" }
   ]
 }
+```
 
 ## Notes
 
