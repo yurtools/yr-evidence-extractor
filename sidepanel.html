@@ -19,6 +19,9 @@
       --shadow2: 0 10px 22px rgba(0,0,0,.28);
       --blur: saturate(140%) blur(10px);
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+      /* Hint for native widgets */
+      color-scheme: dark;
     }
 
     *{ box-sizing:border-box; }
@@ -27,8 +30,8 @@
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       background: radial-gradient(1200px 600px at 10% -20%, rgba(124,92,255,.45), transparent 60%),
-                  radial-gradient(1000px 700px at 110% 10%, rgba(34,197,94,.22), transparent 55%),
-                  var(--bg);
+      radial-gradient(1000px 700px at 110% 10%, rgba(34,197,94,.22), transparent 55%),
+      var(--bg);
       color: var(--text);
       overflow:hidden;
     }
@@ -85,8 +88,10 @@
       transition: .15s ease;
       display:inline-flex;
       align-items:center;
+      justify-content:center;
       gap:8px;
       box-shadow: 0 10px 24px rgba(0,0,0,.15);
+      white-space:nowrap;
     }
     .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.085); }
     .btn:active{ transform: translateY(0px); opacity:.92; }
@@ -170,7 +175,7 @@
       content:"";
       position:absolute; inset:-1px;
       background: radial-gradient(900px 150px at 10% 0%, rgba(124,92,255,.18), transparent 60%),
-                  radial-gradient(700px 140px at 90% 10%, rgba(34,197,94,.10), transparent 55%);
+      radial-gradient(700px 140px at 90% 10%, rgba(34,197,94,.10), transparent 55%);
       pointer-events:none;
       opacity:.85;
     }
@@ -199,9 +204,9 @@
       color: var(--muted);
       margin-top:1px;
     }
-    .badge.fact{ border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.10); }
-    .badge.claim{ border-color: rgba(245,158,11,.25); background: rgba(245,158,11,.10); }
-    .badge.opinion{ border-color: rgba(124,92,255,.30); background: rgba(124,92,255,.13); }
+    .badge.fact{ border-color: rgba(34,197,94,.25); background: rgba(34,197,94,.10); color: rgba(255,255,255,.90); }
+    .badge.claim{ border-color: rgba(245,158,11,.25); background: rgba(245,158,11,.10); color: rgba(255,255,255,.90); }
+    .badge.opinion{ border-color: rgba(124,92,255,.30); background: rgba(124,92,255,.13); color: rgba(255,255,255,.90); }
 
     .textblock{ min-width:0; }
     .title{
@@ -282,6 +287,7 @@
       flex-direction:column;
       gap:12px;
       overflow:auto;
+      overflow-x:hidden; /* prevent sideways scroll */
     }
 
     .field{ display:flex; flex-direction:column; gap:6px; }
@@ -296,9 +302,17 @@
       outline:none;
       transition:.15s ease;
       font-family: inherit;
+      width:100%;
     }
     textarea{ font-family: var(--mono); font-size:12px; line-height:1.15rem; resize: vertical; }
     input::placeholder, textarea::placeholder{ color: rgba(255,255,255,.38); }
+    select:focus, input:focus, textarea:focus{ border-color: rgba(124,92,255,.5); box-shadow: 0 0 0 4px rgba(124,92,255,.14); }
+
+    /* FIX: native dropdown option colors (prevents white-on-white) */
+    select option{
+      color:#111;
+      background:#fff;
+    }
 
     .hint{ font-size:12px; color: var(--muted2); line-height:1.1rem; }
     .mini{
@@ -309,6 +323,21 @@
       border:1px dashed rgba(255,255,255,.12);
       border-radius: 14px;
       background: rgba(0,0,0,.20);
+    }
+
+    /* FIX: model select + load button row */
+    .row2{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:center;
+    }
+    .row2 select{ min-width:0; }
+    @media (max-width: 360px){
+      .row2{
+        grid-template-columns: 1fr;
+      }
+      .row2 button{ width:100%; }
     }
 
     .debug{
@@ -351,130 +380,130 @@
 </head>
 
 <body>
-  <div class="app">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">
-          <div class="mark" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2l8 5v10l-8 5-8-5V7l8-5Z" stroke="rgba(255,255,255,.92)" stroke-width="1.6"/>
-              <path d="M8.6 12.2l2.3 2.3 4.6-5.2" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div style="min-width:0;">
-            <h1>Evidence Extractor</h1>
-            <div class="sub" id="pageTitle">Ready</div>
-          </div>
+<div class="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="logo">
+        <div class="mark" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2l8 5v10l-8 5-8-5V7l8-5Z" stroke="rgba(255,255,255,.92)" stroke-width="1.6"/>
+            <path d="M8.6 12.2l2.3 2.3 4.6-5.2" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
-
-        <div class="row" style="flex:0 0 auto;">
-          <button class="btn ghost" id="settingsBtn" title="Settings">⚙️</button>
-          <button class="btn primary" id="refreshBtn" title="Refresh">⟳ Refresh</button>
+        <div style="min-width:0;">
+          <h1>Evidence Extractor</h1>
+          <div class="sub" id="pageTitle">Ready</div>
         </div>
       </div>
 
-      <div class="controls">
-        <div class="search">
-          <span style="opacity:.7">⌕</span>
-          <input id="search" placeholder="Search facts, claims, opinions…" />
-        </div>
-
-        <div class="seg" role="tablist" aria-label="Category">
-          <button id="tabFacts" class="active">Facts</button>
-          <button id="tabClaims">Claims</button>
-          <button id="tabOpinions">Opinions</button>
-        </div>
-
-        <div class="status" id="status">Idle</div>
-      </div>
-
-      <div class="chips" id="chips" style="display:none;">
-        <div class="chip"><span class="dot green"></span><b id="factsCount">0</b> facts</div>
-        <div class="chip"><span class="dot orange"></span><b id="claimsCount">0</b> claims</div>
-        <div class="chip"><span class="dot"></span><b id="opinionsCount">0</b> opinions</div>
+      <div class="row" style="flex:0 0 auto;">
+        <button class="btn ghost" id="settingsBtn" title="Settings">⚙️</button>
+        <button class="btn primary" id="refreshBtn" title="Refresh">⟳ Refresh</button>
       </div>
     </div>
 
-    <div class="content">
-      <div class="list" id="list"></div>
-
-      <details class="debug">
-        <summary>Debug (extracted text preview)</summary>
-        <div class="dbg-body">
-          <textarea id="pagePreview" readonly></textarea>
-        </div>
-      </details>
-
-      <div id="errorWrap" style="margin-top:12px; display:none;">
-        <div class="errorbox" id="errors"></div>
+    <div class="controls">
+      <div class="search">
+        <span style="opacity:.7">⌕</span>
+        <input id="search" placeholder="Search facts, claims, opinions…" />
       </div>
+
+      <div class="seg" role="tablist" aria-label="Category">
+        <button id="tabFacts" class="active">Facts</button>
+        <button id="tabClaims">Claims</button>
+        <button id="tabOpinions">Opinions</button>
+      </div>
+
+      <div class="status" id="status">Idle</div>
+    </div>
+
+    <div class="chips" id="chips" style="display:none;">
+      <div class="chip"><span class="dot green"></span><b id="factsCount">0</b> facts</div>
+      <div class="chip"><span class="dot orange"></span><b id="claimsCount">0</b> claims</div>
+      <div class="chip"><span class="dot"></span><b id="opinionsCount">0</b> opinions</div>
     </div>
   </div>
 
-  <div class="drawer" id="drawer">
-    <div class="backdrop" id="drawerClose"></div>
-    <div class="sheet" role="dialog" aria-modal="true" aria-label="Settings">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="margin:0; font-size:14px;">Settings</h2>
-        <button class="btn" id="closeSettings">Close</button>
-      </div>
+  <div class="content">
+    <div class="list" id="list"></div>
 
-      <div class="field">
-        <div class="label">Provider</div>
-        <select id="provider">
-          <option value="local">Local (LM Studio / OpenAI-compatible)</option>
-          <option value="openai">OpenAI</option>
-          <option value="claude">Claude (Anthropic)</option>
-          <option value="gemini">Gemini (Google)</option>
-          <option value="kimi_global">Kimi (Moonshot) — Global</option>
-          <option value="kimi_cn">Kimi (Moonshot) — China</option>
+    <details class="debug">
+      <summary>Debug (extracted text preview)</summary>
+      <div class="dbg-body">
+        <textarea id="pagePreview" readonly></textarea>
+      </div>
+    </details>
+
+    <div id="errorWrap" style="margin-top:12px; display:none;">
+      <div class="errorbox" id="errors"></div>
+    </div>
+  </div>
+</div>
+
+<div class="drawer" id="drawer">
+  <div class="backdrop" id="drawerClose"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="Settings">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h2 style="margin:0; font-size:14px;">Settings</h2>
+      <button class="btn" id="closeSettings">Close</button>
+    </div>
+
+    <div class="field">
+      <div class="label">Provider</div>
+      <select id="provider">
+        <option value="local">Local (LM Studio / OpenAI-compatible)</option>
+        <option value="openai">OpenAI</option>
+        <option value="claude">Claude (Anthropic)</option>
+        <option value="gemini">Gemini (Google)</option>
+        <option value="kimi_global">Kimi (Moonshot) — Global</option>
+        <option value="kimi_cn">Kimi (Moonshot) — China</option>
+      </select>
+      <div class="hint">Local uses <b>json_schema</b> response_format (LM Studio compatible) to force strict JSON.</div>
+    </div>
+
+    <div class="field">
+      <div class="label">API Key</div>
+      <input id="apiKey" type="password" placeholder="Required for cloud providers" />
+    </div>
+
+    <div class="field">
+      <div class="label">Model</div>
+      <div class="row2">
+        <select id="modelSelect">
+          <option value="">(load models)</option>
         </select>
-        <div class="hint">Local uses <b>json_schema</b> response_format (LM Studio compatible) to force strict JSON.</div>
+        <button class="btn" id="loadModelsBtn">Load</button>
       </div>
-
-      <div class="field">
-        <div class="label">API Key</div>
-        <input id="apiKey" type="password" placeholder="Required for cloud providers" />
-      </div>
-
-      <div class="field">
-        <div class="label">Model</div>
-        <div style="display:flex; gap:10px;">
-          <select id="modelSelect" style="flex:1;">
-            <option value="">(load models)</option>
-          </select>
-          <button class="btn" id="loadModelsBtn">Load</button>
-        </div>
-      </div>
-
-      <div class="field" id="modelCustomWrap" style="display:none;">
-        <div class="label">Custom model</div>
-        <input id="modelCustom" placeholder="Type model id/name…" />
-      </div>
-
-      <div class="field">
-        <div class="label">Endpoint override</div>
-        <input id="endpoint" placeholder="http://127.0.0.1:1234/v1/chat/completions" />
-      </div>
-
-      <div class="field">
-        <div class="label">Max chars to send</div>
-        <input id="maxChars" value="30000" />
-      </div>
-
-      <div class="field">
-        <div class="label">Prompt template (Python)</div>
-        <textarea id="promptPy" style="height:260px;" spellcheck="false"></textarea>
-        <div class="hint">
-          Use placeholders: <b>{title}</b>, <b>{url}</b>, <b>{text}</b>.<br>
-          Requirement: output list items in <b>English</b> even if input text is not English; evidence remains exact quote in original language.
-        </div>
-      </div>
-
-      <div class="mini" id="providerHint"></div>
     </div>
-  </div>
 
-  <script src="sidepanel.js"></script>
+    <div class="field" id="modelCustomWrap" style="display:none;">
+      <div class="label">Custom model</div>
+      <input id="modelCustom" placeholder="Type model id/name…" />
+    </div>
+
+    <div class="field">
+      <div class="label">Endpoint override</div>
+      <input id="endpoint" placeholder="http://127.0.0.1:1234/v1/chat/completions" />
+    </div>
+
+    <div class="field">
+      <div class="label">Max chars to send</div>
+      <input id="maxChars" value="30000" />
+    </div>
+
+    <div class="field">
+      <div class="label">Prompt template (Python)</div>
+      <textarea id="promptPy" style="height:260px;" spellcheck="false"></textarea>
+      <div class="hint">
+        Use placeholders: <b>{title}</b>, <b>{url}</b>, <b>{text}</b>.<br>
+        Output items in <b>English</b>, evidence as exact quote in original language.
+      </div>
+    </div>
+
+    <div class="mini" id="providerHint"></div>
+  </div>
+</div>
+
+<script src="sidepanel.js"></script>
 </body>
 </html>
